@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites | Exploring World</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="favoritesstyle.css">
+</head>
+
+<body>
+    <!-- Top Navigation Banner -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Exploring World</a>
+
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+
+                <li>
+                    <a href="#">Destinations <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown">
+                        <li><a href="china.html">China</a></li>
+                        <li><a href="indonesia.html">Indonesia</a></li>
+                        <li><a href="japan.html">Japan</a></li>
+                        <li><a href="korea.html">Korea</a></li>
+                        <li><a href="malaysia.html">Malaysia</a></li>
+                        <li><a href="taiwan.html">Taiwan</a></li>
+                        <li><a href="thailand.html">Thailand</a></li>
+                        <li><a href="turkey.html">Turkey</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="tips.html">Travel Tips</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="favorites.html">My Favorites</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h2 class="section-title">My Favorite Destinations</h2>
+        <div class="favorites-grid" id="favoritesContainer"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Exploring World</h3>
+            <p>Your ultimate guide to unforgettable travel experiences</p>
+            <div class="social-links">
+                <a href="https://www.facebook.com/share/16JKJN1tPM/?mibextid=wwXIfr" aria-label="Facebook"><i
+                        class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/exploringgg_worlddd?igsh=Ymtzdzllb2k4c251" aria-label="Instagram"><i
+                        class="fab fa-instagram"></i></a>
+                <a href="https://x.com/Exploringgg_w?t=Nw5BNHBaVMo7OgTGkDoV4w&s=09" aria-label="Twitter"><i
+                        class="fab fa-twitter"></i></a>
+            </div>
+            <p>&copy; 2025 Exploring World. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Session Storage
+        function updateVisitedStates() {
+            const countries = ['china', 'indonesia', 'japan', 'korea', 'malaysia', 'taiwan', 'thailand', 'turkey'];
+
+            countries.forEach(country => {
+                // 1. Change Explore button color in featured destinations
+                const exploreBtn = document.querySelector(`.destination-card a[href="${country}.html"]`);
+                if (exploreBtn && sessionStorage.getItem(`visited_${country}`)) {
+                    exploreBtn.style.backgroundColor = '#7886C7';
+                    exploreBtn.style.color = 'white';
+                }
+
+                // 2. Change text color in nav dropdown
+                const navLink = document.querySelector(`.dropdown li a[href="${country}.html"]`);
+                if (navLink && sessionStorage.getItem(`visited_${country}`)) {
+                    navLink.style.color = '#7886C7';
+                    navLink.style.fontWeight = '600';
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateVisitedStates);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateVisitedStates);
+        // Mobile menu toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function () {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const favoritesContainer = document.getElementById('favoritesContainer');
+            let favorites = JSON.parse(localStorage.getItem('travelFavorites')) || [];
+
+            // Mobile menu toggle (same as other pages)
+            document.querySelector('.menu-toggle').addEventListener('click', function () {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function () {
+                    document.querySelector('.nav-links').classList.remove('active');
+                });
+            });
+
+            // Function to update display
+            function updateFavoritesDisplay() {
+                favoritesContainer.innerHTML = '';
+
+                if (favorites.length === 0) {
+                    favoritesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-heart"></i>
+                            <h3>No favorites yet</h3>
+                            <p>Start adding favorites by clicking the heart icon on destination pages</p>
+                            <a href="index.html" class="btn" style="margin-top: 20px;">Explore Destinations</a>
+                        </div>
+                    `;
+                } else {
+                    favorites.forEach(favorite => {
+                        const card = document.createElement('div');
+                        card.className = 'favorite-card';
+                        card.innerHTML = `
+                            <div class="favorite-image">
+                                <img src="${favorite.image}" alt="${favorite.destination}">
+                                <button class="remove-btn" data-id="${favorite.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="favorite-content">
+                                <h3>${favorite.destination}</h3>
+                                <p class="country"><i class="fas fa-map-marker-alt"></i> ${favorite.country}</p>
+                            </div>
+                        `;
+                        favoritesContainer.appendChild(card);
+                    });
+
+                    // Add event listeners to remove buttons
+                    document.querySelectorAll('.remove-btn').forEach(btn => {
+                        btn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            const id = this.getAttribute('data-id');
+                            favorites = favorites.filter(fav => fav.id !== id);
+                            localStorage.setItem('travelFavorites', JSON.stringify(favorites));
+                            updateFavoritesDisplay();
+                        });
+                    });
+                }
+            }
+
+            // Initial display
+            updateFavoritesDisplay();
+        });
+    </script>
+    
+</body>
+
+</html>
